@@ -1,0 +1,122 @@
+syntax = "proto2";
+
+package classification.protos;
+
+// Message for defining a preprocessing operation on input data.
+// See: //object_detection/core/preprocessor.py
+message PreprocessingStep {
+  oneof preprocessing_step {
+    NormalizeImage normalize_image = 1;
+    RandomHorizontalFlip random_horizontal_flip = 2;
+    RandomPixelValueScale random_pixel_value_scale = 3;
+    RandomRGBtoGray random_rgb_to_gray = 4;
+    RandomAdjustBrightness random_adjust_brightness = 5;
+    RandomAdjustContrast random_adjust_contrast = 6;
+    RandomAdjustHue random_adjust_hue = 7;
+    RandomAdjustSaturation random_adjust_saturation = 8;
+    RandomDistortColor random_distort_color = 9;
+    RandomBlackPatches random_black_patches = 10;
+    ResizeImage resize_image = 11;
+    RandomVerticalFlip random_vertical_flip = 12;
+    RandomRotation90 random_rotation90 = 13;
+    RandomCropImage random_crop_image = 14;
+  }
+}
+
+// Normalizes pixel values in an image.
+// For every channel in the image, moves the pixel values from the range
+// [original_minval, original_maxval] to [target_minval, target_maxval].
+message NormalizeImage {
+  optional float original_minval = 1 [default=0];
+  optional float original_maxval = 2 [default=255];
+  optional float target_minval = 3 [default=0];
+  optional float target_maxval = 4 [default=1];
+}
+
+// Randomly horizontally flips the image and detections 50% of the time.
+message RandomHorizontalFlip {}
+
+// Randomly vertically flips the image and detections 50% of the time.
+message RandomVerticalFlip {}
+
+// Randomly rotates the image and detections by 90 degrees counter-clockwise
+// 50% of the time.
+message RandomRotation90 {}
+
+// Randomly scales the values of all pixels in the image by some constant value
+// between [minval, maxval], then clip the value to a range between [0, 1.0].
+message RandomPixelValueScale {
+  optional float minval = 1 [default=0.9];
+  optional float maxval = 2 [default=1.1];
+}
+
+// Randomly convert entire image to grey scale.
+message RandomRGBtoGray {
+  optional float probability = 1 [default=0.1];
+}
+
+// Randomly changes image brightness by up to max_delta. Image outputs will be
+// saturated between 0 and 1.
+message RandomAdjustBrightness {
+  optional float max_delta=1 [default=0.2];
+}
+
+// Randomly scales contract by a value between [min_delta, max_delta].
+message RandomAdjustContrast {
+  optional float min_delta = 1 [default=0.8];
+  optional float max_delta = 2 [default=1.25];
+}
+
+// Randomly alters hue by a value of up to max_delta.
+message RandomAdjustHue {
+  optional float max_delta = 1 [default=0.02];
+}
+
+// Randomly changes saturation by a value between [min_delta, max_delta].
+message RandomAdjustSaturation {
+  optional float min_delta = 1 [default=0.8];
+  optional float max_delta = 2 [default=1.25];
+}
+
+// Performs a random color distortion. color_orderings should either be 0 or 1.
+message RandomDistortColor {
+  optional int32 color_ordering = 1;
+}
+
+//Randomly crop images
+message CropRange {
+  optional float start = 1 [default=0.8];
+  optional float end = 2 [default=1.0];
+}
+
+message RandomCropImage {
+  optional CropRange width_range = 1;
+  optional CropRange height_range = 2;
+  optional float crop_probability = 3 [default=1.0];
+}
+
+// Randomly adds black square patches to an image.
+message RandomBlackPatches {
+  // The maximum number of black patches to add.
+  optional int32 max_black_patches = 1 [default=10];
+
+  // The probability of a black patch being added to an image.
+  optional float probability = 2 [default=0.5];
+
+  // Ratio between the dimension of the black patch to the minimum dimension of
+  // the image (patch_width = patch_height = min(image_height, image_width)).
+  optional float size_to_image_ratio = 3 [default=0.1];
+}
+
+// Resizes images to [new_height, new_width].
+message ResizeImage {
+  optional int32 new_height = 1;
+  optional int32 new_width = 2;
+  enum Method {
+    AREA=1;
+    BICUBIC=2;
+    BILINEAR=3;
+    NEAREST_NEIGHBOR=4;
+  }
+  optional Method method = 3 [default=BILINEAR];
+}

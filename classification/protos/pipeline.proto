@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package classification.protos;
+
+import "classification/protos/spec.proto";
+import "classification/protos/train.proto";
+import "classification/protos/eval.proto";
+
+// Convenience message for configuring a training and eval pipeline. Allows all
+// of the pipeline parameters to be configured from one file.
+message TrainEvalPipelineConfig {
+  optional Spec spec = 1;
+  optional TrainConfig train_config = 2;
+  optional EvalConfig eval_config = 3;
+}

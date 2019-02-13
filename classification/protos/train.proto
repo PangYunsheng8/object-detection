@@ -1,0 +1,101 @@
+syntax = "proto2";
+
+package classification.protos;
+
+import "classification/protos/preprocessor.proto";
+import "classification/protos/optimizer.proto";
+
+message TrainConfig {
+
+    // The address of the TensorFlow master to use.
+    optional string master = 1[default=""];
+
+    // Number of model clones to deploy. Note For historical reasons 
+    // loss from all clones averaged out and learning rate decay 
+    // happen per clone epochs.
+    optional uint32 num_clones = 2[default=1];
+
+    // Wheter to use CPUs to deploy clones.
+    optional bool clone_on_cpu = 3[default=false];
+
+    // Number of worker replicas.
+    optional uint32 worker_replicas = 4[default=1];
+
+    // The number of parameter servers. If the value is 0, then the 
+    // parameters are handled locally by the worker.
+    optional uint32 num_ps_tasks = 5[default=0];
+
+    // Task id of the replica running the training.
+    optional uint32 task = 6[default=0];
+
+    // Number of steps to train the classification for. If 0, will train the model
+    // indefinitely.
+    optional uint32 num_steps = 7 [default=0];
+
+    // The frequency with which logs are print.
+    optional uint32 log_every_n_steps = 8[default=10];
+
+    // The frequency with which the model is saved, in seconds.
+    optional uint32 save_summaries_secs = 9[default=600];
+
+    // The frequency with which the model is saved, in seconds.
+    optional uint32 save_interval_secs = 10[default=600];
+
+    // How frequently to keep checkpoints.
+    optional uint32 keep_checkpoint_every_n_hours = 11 [default=1000];
+
+    // The amount of label smoothing.
+    optional float label_smoothing = 12[default=0.0];
+
+    // The path to a checkpoint from which to fine-tune.
+    optional string fine_tune_checkpoint = 13 [default=""];
+
+    // Comma-separated list of scopes of variables to exclude when restoring from a checkpoint.
+    optional string checkpoint_exclude_scopes = 14 [default=""];
+
+    // Comma-separated list of scopes to filter the set of variables to train. By default, "" would train all the variables.
+    optional string trainable_scopes = 15 [default=""];
+
+    // When restoring a checkpoint would ignore missing variables.
+    optional bool ignore_missing_vars = 16[default=false];
+
+    // Data augmentation options.
+    repeated PreprocessingStep data_augmentation_options = 17;
+
+    // Optimizer used to train the classification model.
+    optional Optimizer optimizer = 18;
+
+    // Whether to synchronize replicas during training.
+    optional bool sync_replicas = 19 [default=false];
+
+    // Number of replicas to aggregate before making parameter updates.
+    optional int32 replicas_to_aggregate = 20 [default=1];
+
+    // The number of samples in each batch.
+    optional uint32 batch_size = 21[default=32];
+
+    // The number of parallel readers that read data from the dataset.
+    optional uint32 num_readers = 22[default=4];
+
+    // The number of threads used to create the batches.
+    optional uint32 num_batch_queue_threads = 23[default=4];
+
+    // Maximum number of elements to store within a queue.
+    optional int32 batch_queue_capacity = 24 [default=150];
+
+    // Maximum capacity of the queue used to prefetch assembled batches.
+    optional int32 prefetch_queue_capacity = 25 [default=32];
+
+    // If greater than 0, clips gradients by this value.
+    optional float gradient_clipping_by_norm = 26 [default=0.0];
+
+    // If greater than 0, multiplies the gradient of bias variables by this
+    // amount.
+    optional float bias_grad_multiplier = 27 [default=0];
+
+    // Variables that should not be updated during training.
+    repeated string freeze_variables = 28;
+
+    // The weight decay on the model weights.
+    optional float weight_decay = 29 [default=0.0004];
+}

@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package classification.protos;
+
+import "classification/protos/preprocessor.proto";
+
+message EvalConfig {
+    // The address of the TensorFlow master to use.
+    optional string master = 1[default=""];
+
+    // The number of samples in each batch.
+    optional uint32 batch_size = 2[default=32];
+
+    // Data preprocess options.
+    repeated PreprocessingStep data_preprocess_options = 3;
+
+    // Max number of batches to evaluate by default use all.
+    optional uint32 max_num_batches = 4;
+
+    // The number of threads used to create the batches.
+    optional uint32 num_preprocessing_threads = 5 [default=4];
+}

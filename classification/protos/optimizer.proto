@@ -1,0 +1,110 @@
+syntax = "proto2";
+
+package classification.protos;
+
+// Messages for configuring the optimizing strategy for training object
+// detection models.
+
+// Top level optimizer message.
+message Optimizer {
+  oneof optimizer {
+    RMSPropOptimizer rms_prop_optimizer = 1;
+    MomentumOptimizer momentum_optimizer = 2;
+    AdamOptimizer adam_optimizer = 3;
+    AdadeltaOptimizer adadelta_optimizer = 4;
+    AdagradOptimizer adagrad_optimizer = 5;
+    FtrlOptimizer ftrl_optimizer = 6;
+    GradientDescentOptimizer sgd = 7;
+  }
+  optional bool use_moving_average = 8 [default = true];
+  optional float moving_average_decay = 9 [default = 0.9999];
+}
+
+// Configuration message for the GradientDescentOptimizer.
+// see: https://www.tensorflow.org/api_docs/python/tf/train/GradientDescentOptimizer
+message GradientDescentOptimizer {}
+
+// Configuration message for the AdadeltaOptimizer.
+// see: https://www.tensorflow.org/api_docs/python/tf/train/AdadeltaOptimizer
+message AdadeltaOptimizer {
+  optional LearningRate learning_rate = 1;
+  optional float rho = 2 [default = 0.95];
+  optional float epsilon = 3 [default = 1.0];
+}
+
+// Configuration message for the AdagradOptimizer.
+// see: https://www.tensorflow.org/api_docs/python/tf/train/AdagradOptimizer
+message AdagradOptimizer {
+  optional LearningRate learning_rate = 1;
+  optional float initial_accumulator_value = 2 [default = 0.1];
+}
+
+// Configuration message for the AdamOptimizer
+// See: https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer
+message AdamOptimizer {
+  optional LearningRate learning_rate = 1;
+  optional float beta1 = 2 [default = 0.9];
+  optional float beta2 = 3 [default = 0.999];
+  optional float epsilon = 4 [default = 1.0];
+}
+
+// Configuration message for the FtrlOptimizer
+// See: https://www.tensorflow.org/api_docs/python/tf/train/FtrlOptimizer
+message FtrlOptimizer {
+  optional LearningRate learning_rate = 1;
+  optional float learning_rate_power = 2 [default = -0.5];
+  optional float initial_accumulator_value = 3 [default = 0.1];
+  optional float l1_regularization_strength = 4 [default = 0.0];
+  optional float l2_regularization_strength = 5 [default = 0.0];
+}
+
+// Configuration message for the RMSPropOptimizer
+// See: https://www.tensorflow.org/api_docs/python/tf/train/RMSPropOptimizer
+message RMSPropOptimizer {
+  optional LearningRate learning_rate = 1;
+  optional float momentum_optimizer_value = 2 [default = 0.9];
+  optional float decay = 3 [default = 0.9];
+  optional float epsilon = 4 [default = 1.0];
+}
+
+// Configuration message for the MomentumOptimizer
+// See: https://www.tensorflow.org/api_docs/python/tf/train/MomentumOptimizer
+message MomentumOptimizer {
+  optional LearningRate learning_rate = 1;
+  optional float momentum_optimizer_value = 2 [default = 0.9];
+}
+
+// Configuration message for optimizer learning rate.
+message LearningRate {
+  oneof learning_rate {
+    ConstantLearningRate constant_learning_rate = 1;
+    ExponentialDecayLearningRate exponential_decay_learning_rate = 2;
+    PolynomialDecayLearningRate polynomial_decay_earning_rate = 3;
+  }
+}
+
+// Configuration message for a constant learning rate.
+message ConstantLearningRate {
+  optional float learning_rate = 1 [default = 0.002];
+}
+
+// Configuration message for an exponentially decaying learning rate.
+// See https://www.tensorflow.org/versions/master/api_docs/python/train/ \
+//     decaying_the_learning_rate#exponential_decay
+message ExponentialDecayLearningRate {
+  optional float initial_learning_rate = 1 [default = 0.002];
+  optional uint32 decay_steps = 2 [default = 4000000];
+  optional float decay_factor = 3 [default = 0.95];
+  optional bool staircase = 4 [default = true];
+}
+
+// Configuration message for a polynomial decaying learning rate.
+// See https://www.tensorflow.org/versions/master/api_docs/python/train/ \
+//     decaying_the_learning_rate#polynomial_decay
+message PolynomialDecayLearningRate {
+  optional float initial_learning_rate = 1 [default = 0.002];
+  optional uint32 decay_steps = 2 [default = 4000000];
+  optional float end_learning_rate = 3 [default = 0.0001];
+  optional float power = 4 [default = 1.0];
+  optional bool cycle = 5 [default = false];
+}
